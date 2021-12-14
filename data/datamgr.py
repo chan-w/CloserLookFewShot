@@ -7,6 +7,7 @@ import torchvision.transforms as transforms
 import data.additional_transforms as add_transforms
 from data.dataset import SimpleDataset, SetDataset, EpisodicBatchSampler
 from abc import abstractmethod
+import albumentations as A
 
 class TransformLoader:
     def __init__(self, image_size, 
@@ -29,14 +30,14 @@ class TransformLoader:
             return method([int(self.image_size*1.15), int(self.image_size*1.15)])
         elif transform_type=='Normalize':
             return method(**self.normalize_param )
-        elif transform_type == 'RandomBrighnessContrast':
+        elif transform_type == 'TrivialAugmentWide':
             return method(self.image_size)
         else:
             return method()
 
     def get_composed_transform(self, aug = False):
         if aug:
-            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomBrighnessContrast']
+            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'TrivialAugmentWide']
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
 
