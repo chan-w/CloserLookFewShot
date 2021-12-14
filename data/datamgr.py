@@ -55,7 +55,7 @@ class TransformLoader:
 
     def get_composed_transform(self, aug = False):
         if aug:
-            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomBrightnessContrast']
+            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomAutocontrast', 'ColorJitter'] # 'RandomBrightnessContrast']
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
 
