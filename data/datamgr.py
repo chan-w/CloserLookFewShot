@@ -10,7 +10,7 @@ from abc import abstractmethod
 
 class TransformLoader:
     def __init__(self, image_size, 
-                 normalize_param    = dict(mean= [0.485, 0.456, 0.406] , std=[0.229, 0.224, 0.225]),
+                 normalize_param    = dict(mean= [0.5, 0.5, 0.5] , std=[0.5, 0.5, 0.5]),
                  jitter_param       = dict(Brightness=0.4, Contrast=0.4, Color=0.4)):
         self.image_size = image_size
         self.normalize_param = normalize_param
@@ -29,12 +29,14 @@ class TransformLoader:
             return method([int(self.image_size*1.15), int(self.image_size*1.15)])
         elif transform_type=='Normalize':
             return method(**self.normalize_param )
+        elif transform_type == 'RandomBrighnessContrast':
+            return method(self.image_size)
         else:
             return method()
 
     def get_composed_transform(self, aug = False):
         if aug:
-            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize']
+            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomBrighnessContrast']
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
 
