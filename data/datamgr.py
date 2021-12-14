@@ -7,6 +7,19 @@ import torchvision.transforms as transforms
 import data.additional_transforms as add_transforms
 from data.dataset import SimpleDataset, SetDataset, EpisodicBatchSampler
 from abc import abstractmethod
+import albumentations as A
+
+
+class Transforms:
+    """As suggested in https://github.com/albumentations-team/albumentations/issues/1010"""
+    def __init__(self, transforms): # the provided transforms are already composed
+        self.transforms = transforms
+
+    def __call__(self, img, *args, **kwargs):
+        return self.transforms(image=np.array(img))
+    
+    def __repr__(self):
+        return self.transforms.__repr__()
 
 class TransformLoader:
     def __init__(self, image_size, 
@@ -20,23 +33,29 @@ class TransformLoader:
         if transform_type=='ImageJitter':
             method = add_transforms.ImageJitter( self.jitter_param )
             return method
-        method = getattr(transforms, transform_type)
-        if transform_type=='RandomSizedCrop':
-            return method(self.image_size) 
-        elif transform_type=='CenterCrop':
-            return method(self.image_size) 
-        elif transform_type=='Scale':
-            return method([int(self.image_size*1.15), int(self.image_size*1.15)])
-        elif transform_type=='Normalize':
-            return method(**self.normalize_param )
-        elif transform_type == 'RandomBrighnessContrast':
-            return method(self.image_size)
-        else:
+        try:
+            method = getattr(transforms, transform_type)
+            if transform_type=='RandomSizedCrop':
+                return method(self.image_size) 
+            elif transform_type=='CenterCrop':
+                return method(self.image_size) 
+            elif transform_type=='Scale':
+                return method([int(self.image_size*1.15), int(self.image_size*1.15)])
+            elif transform_type=='Normalize':
+                return method(**self.normalize_param )
+            elif transform_type == 'RandomBrighnessContrast':
+                return method(self.image_size)
+            else:
+                return method()
+        except AttributeError: # use Albumentations transforms
+            method = getattr(A, transform_type)
             return method()
+            # print("need albumentations")
+            # return 420
 
     def get_composed_transform(self, aug = False):
         if aug:
-            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomBrighnessContrast']
+            transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize', 'RandomBrightnessContrast']
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
 
