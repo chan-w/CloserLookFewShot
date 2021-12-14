@@ -8,6 +8,19 @@ import data.additional_transforms as add_transforms
 from data.dataset import SimpleDataset, SetDataset, EpisodicBatchSampler
 from abc import abstractmethod
 
+
+class ImageFloatToInt(object):
+    def __call__(self, img):
+        # if img.is_cuda:
+        #     return (img * 255).cuda.ByteTensor
+        # else:
+        return (img * 255).ByteTensor
+
+class ImageIntToFloat(object):
+    def __call__(self, img):
+        # if img.is_cuda:
+        return img.FloatTensor / 255.0
+
 class TransformLoader:
     def __init__(self, image_size, 
                  normalize_param    = dict(mean= [0.485, 0.456, 0.406] , std=[0.229, 0.224, 0.225]),
@@ -20,6 +33,11 @@ class TransformLoader:
         if transform_type=='ImageJitter':
             method = add_transforms.ImageJitter( self.jitter_param )
             return method
+        if transform_type == 'ImageFloatToInt':
+            return ImageFloatToInt()
+        elif transform_type == 'ImageIntToFloat':
+            return ImageIntToFloat()
+
         method = getattr(transforms, transform_type)
         if transform_type=='RandomSizedCrop':
             return method(self.image_size) 
@@ -35,7 +53,7 @@ class TransformLoader:
     def get_composed_transform(self, aug = False):
         if aug:
             # transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize']
-            transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize', 'TrivialAugmentWide']
+            transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize', 'ImageFloatToInt', 'TrivialAugmentWide', 'ImageIntToFloat']
 
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
