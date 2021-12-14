@@ -45,8 +45,17 @@ class TransformLoader:
             return method(**self.normalize_param )
         elif transform_type == 'RandomBrighnessContrast':
             return method(self.image_size)
+        elif transform_type == 'RandomAutocontrast':
+            return method()
+        elif transform_type == 'ColorJitter':
+            return method(brightness=.5, hue=.3)
+        elif transform_type ==  'RandomRotation':
+            return method(degrees=(0,180))
+        elif transform_type == 'RandomAdjustSharpness':
+            return method(sharpness=2)
         else:
             return method()
+
         # except AttributeError: # use Albumentations transforms
         #     method = getattr(A, transform_type)
         #     return method()
