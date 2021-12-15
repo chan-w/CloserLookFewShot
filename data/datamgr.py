@@ -14,12 +14,12 @@ class ImageFloatToInt(object):
         # if img.is_cuda:
         #     return (img * 255).cuda.ByteTensor
         # else:
-        return (img * 255).ByteTensor
+        return (img * 255).byte()
 
 class ImageIntToFloat(object):
     def __call__(self, img):
         # if img.is_cuda:
-        return img.FloatTensor / 255.0
+        return img.float() / 255.0
 
 class TransformLoader:
     def __init__(self, image_size, 
