@@ -53,9 +53,8 @@ class TransformLoader:
 
     def get_composed_transform(self, aug = False):
         if aug:
-            # Replace the first four augmentation transforms with TrivialAugmentWide
             # transform_list = ['RandomSizedCrop', 'ImageJitter', 'RandomHorizontalFlip', 'ToTensor', 'Normalize']
-            transform_list = ['TrivialAugmentWide', 'ToTensor', 'Normalize']
+            transform_list = ['TrivialAugmentWide', 'Scale','CenterCrop', 'ToTensor', 'Normalize']
 
         else:
             transform_list = ['Scale','CenterCrop', 'ToTensor', 'Normalize']
