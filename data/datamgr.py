@@ -14,6 +14,7 @@ class ImageFloatToInt(object):
         # if img.is_cuda:
         #     return (img * 255).cuda.ByteTensor
         # else:
+        print(torch.max(img), torch.min(img))
         return (img * 255).byte()
 
 class ImageIntToFloat(object):
