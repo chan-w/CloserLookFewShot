@@ -106,7 +106,7 @@ if __name__ == '__main__':
         model = model_dict[params.model]()
 
     model = model
-    tmp = torch.load(modelfile)
+    tmp = torch.load(modelfile, map_location=torch.device('cpu'))
     state = tmp['state']
     state_keys = list(state.keys())
     for i, key in enumerate(state_keys):

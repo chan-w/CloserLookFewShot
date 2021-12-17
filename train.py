@@ -172,7 +172,7 @@ if __name__=='__main__':
     if params.resume:
         resume_file = get_resume_file(params.checkpoint_dir)
         if resume_file is not None:
-            tmp = torch.load(resume_file)
+            tmp = torch.load(resume_file, map_location=torch.device('cpu'))
             start_epoch = tmp['epoch']+1
             model.load_state_dict(tmp['state'])
     elif params.warmup: #We also support warmup from pretrained baseline feature, but we never used in our paper
@@ -180,7 +180,7 @@ if __name__=='__main__':
         if params.train_aug:
             baseline_checkpoint_dir += '_aug'
         warmup_resume_file = get_resume_file(baseline_checkpoint_dir)
-        tmp = torch.load(warmup_resume_file)
+        tmp = torch.load(warmup_resume_file, map_location=torch.device('cpu'))
         if tmp is not None: 
             state = tmp['state']
             state_keys = list(state.keys())

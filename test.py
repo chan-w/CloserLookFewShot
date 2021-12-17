@@ -105,7 +105,7 @@ if __name__ == '__main__':
         else:
             modelfile   = get_best_file(checkpoint_dir)
         if modelfile is not None:
-            tmp = torch.load(modelfile)
+            tmp = torch.load(modelfile, map_location=torch.device('cpu'))
             model.load_state_dict(tmp['state'])
 
     split = params.split
