@@ -89,7 +89,7 @@ if __name__ == '__main__':
     else:
        raise ValueError('Unknown method')
 
-    model = model.cuda()
+    model = model
 
     checkpoint_dir = '%s/checkpoints/%s/%s_%s' %(configs.save_dir, params.dataset, params.model, params.method)
     if params.train_aug:

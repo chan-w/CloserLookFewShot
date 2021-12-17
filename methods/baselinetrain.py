@@ -22,14 +22,14 @@ class BaselineTrain(nn.Module):
         self.DBval = False; #only set True for CUB dataset, see issue #31
 
     def forward(self,x):
-        x    = Variable(x.cuda())
+        x    = Variable(x)
         out  = self.feature.forward(x)
         scores  = self.classifier.forward(out)
         return scores
 
     def forward_loss(self, x, y):
         scores = self.forward(x)
-        y = Variable(y.cuda())
+        y = Variable(y)
         return self.loss_fn(scores, y )
     
     def train_loop(self, epoch, train_loader, optimizer):
@@ -57,7 +57,7 @@ class BaselineTrain(nn.Module):
     def analysis_loop(self, val_loader, record = None):
         class_file  = {}
         for i, (x,y) in enumerate(val_loader):
-            x = x.cuda()
+            x = x
             x_var = Variable(x)
             feats = self.feature.forward(x_var).data.cpu().numpy()
             labels = y.cpu().numpy()
