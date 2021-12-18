@@ -56,22 +56,37 @@ class SimpleDataManager(DataManager):
         self.trans_loader = TransformLoader(image_size)
 
     # def get_data_loader(self, data_file, aug): #parameters that would change on train/val set
-        # transform = self.trans_loader.get_composed_transform(aug)
-        # dataset = SimpleDataset(data_file, transform)
-        # data_loader_params = dict(batch_size = self.batch_size, shuffle = True, num_workers = 12, pin_memory = True)       
-        # data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
+    #     transform = self.trans_loader.get_composed_transform(aug)
+    #     dataset = SimpleDataset(data_file, transform)
+    #     data_loader_params = dict(batch_size = self.batch_size, shuffle = True, num_workers = 0, pin_memory = True)       
+    #     data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
 
-        # return data_loader
+    #     return data_loader
     
     def get_data_loader(self, data_file, aug): #parameters that would change on train/val set
         transform = self.trans_loader.get_composed_transform(aug)
         dataset = SetDataset( data_file , self.batch_size, transform )
         # sampler = EpisodicBatchSampler(len(dataset), self.n_way, self.n_eposide )  
         # data_loader_params = dict(batch_sampler = sampler,  num_workers = 12, pin_memory = True)
-        inv_counts = [1/len(dataset.sub_meta[cl]) for cl in dataset.cl_list]
+        # print(dataset.cl_list, dataset.sub_meta)
+        # print([c for c in dataset.cl_list if c not in dataset.sub_meta])
+        # for each class, weight class 1/label
+        # inv_counts = [1/cl for cl in dataset.cl_list]
+        # map cl_list to 1-index
+        one_idxes = list(range(1,len(dataset.cl_list) + 1))
+        denoms = {k: one_idxes[idx] for idx, k in enumerate(dataset.cl_list)}
+        inv_counts = {cl: 1 / denoms[cl] for cl in dataset.cl_list}
+        # print(dataset.meta, inv_counts)
+        # weight for each image
         weights = [inv_counts[cl] for cl in dataset.meta['image_labels']]
-        sampler = WeightedRamdomSampler(weights, len(weights))
-        data_loader_params = dict(sampler=sampler, num_workers=12, pin_memory=True)
+        # weights = {cl: inv_counts[cl] for cl in dataset.meta['image_labels']}
+        print(weights)
+
+        print("Using WeightedRamdomSampler")
+        sampler = WeightedRandomSampler(weights, len(weights))
+        data_loader_params = dict(sampler=sampler, num_workers=0, pin_memory=True)
+        # data_loader_params = dict(batch_size=self.batch_size, shuffle=True, num_workers=0, pin_memory = True)       
+
         data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
         return data_loader
     
@@ -93,8 +108,9 @@ class SetDataManager(DataManager):
         # data_loader_params = dict(batch_sampler = sampler,  num_workers = 12, pin_memory = True)
         inv_counts = [1/len(dataset.sub_meta[cl]) for cl in dataset.cl_list]
         weights = [inv_counts[cl] for cl in dataset.meta['image_labels']]
+        print("Using WeightedRamdomSampler")
         sampler = WeightedRamdomSampler(weights, len(weights))
-        data_loader_params = dict(sampler=sampler, num_workers=12, pin_memory=True)
+        data_loader_params = dict(sampler=sampler, num_workers=0, pin_memory=True)
         data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
         return data_loader
 
